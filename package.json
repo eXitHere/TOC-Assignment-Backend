@@ -14,7 +14,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.3"
+    "express": "^4.17.3",
+    "python-shell": "^3.0.1"
   },
   "devDependencies": {
     "husky": "^7.0.4",
