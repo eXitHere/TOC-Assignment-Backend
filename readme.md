@@ -18,6 +18,12 @@
 2. [Pim Piyajiranan](https://github.com/It5Me)
 3. [Sumincha Chalowong](https://github.com/DearSmc)
 
+## Repository
+
+1. [Backend](https://github.com/eXitHere/TOC-Assignment-Backend)
+2. [Frontend](https://github.com/eXitHere/TOC-Assignment-Backend)
+3. [Scraping](https://github.com/eXitHere/TOC-Assignment-Backend)
+
 ## installation
 
 ```
