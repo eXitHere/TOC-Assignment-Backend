@@ -2,7 +2,7 @@
 
 ## Members
 
-1. [Thanakorn Chancherngpanich](https://github.com/soon-404?tab=following)
+1. [Thanakorn Chancherngpanich](https://github.com/soon-404)
 2. [Thanadol Sinananvanich](https://github.com/swekiiz)
 3. [Thana Tingprasom](https://github.com/eXitHere)
 4. [Prachya Thongsan](https://github.com/LittleLunar)
