@@ -25,14 +25,13 @@ const pdfParse = require('pdf-parse');
 // });
 
 exports.uploadTranscript = async (req, res) => {
-  console.log('req', req.file);
-
   // console.log('req.file.buffer', req.file.buffer.toString());
+  if (!req.file) {
+    return res.status(400).send('กรุณาอัพโหลดไฟล์');
+  }
   pdfParse(req.file.buffer).then((result) => {
-    res.send(result.text);
+    res.status(200).send(result.text);
   });
-  // const data = req.file.buffer.toString();
+
   // TODO: Call python script
-  // const json = { data };
-  // res.status(200).send('hello');
 };
