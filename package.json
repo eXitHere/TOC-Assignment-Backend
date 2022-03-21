@@ -18,6 +18,7 @@
     "express": "^4.17.3",
     "multer": "^1.4.4",
     "pdf-parse": "^1.1.1",
+    "puppeteer": "^13.5.1",
     "python-shell": "^3.0.1"
   },
   "devDependencies": {

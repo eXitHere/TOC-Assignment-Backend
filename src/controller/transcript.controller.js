@@ -27,11 +27,12 @@ const pdfParse = require('pdf-parse');
 exports.uploadTranscript = async (req, res) => {
   // console.log('req.file.buffer', req.file.buffer.toString());
   if (!req.file) {
-    return res.status(400).send('กรุณาอัพโหลดไฟล์');
+    return res.status(400).send({ error: 'กรุณาอัพโหลดไฟล์' });
   }
-  pdfParse(req.file.buffer).then((result) => {
-    res.status(200).send(result.text);
-  });
+  // parse text from pdf
+
+  const textFromPDF = await pdfParse(req.file.buffer);
+  res.status(200).send(result.text);
 
   // TODO: Call python script
 };
