@@ -32,7 +32,7 @@ exports.uploadTranscript = async (req, res) => {
   // parse text from pdf
 
   const textFromPDF = await pdfParse(req.file.buffer);
-  res.status(200).send(result.text);
+  res.status(200).send(textFromPDF.text);
 
   // TODO: Call python script
 };
