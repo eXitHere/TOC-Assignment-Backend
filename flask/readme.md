@@ -23,5 +23,11 @@ $ pip install -r requirements.txt
 ## developer
 
 ```
-python src/server.js
+python run.js
+```
+
+```
+route
+- '/'
+- '/api/v1/test'
 ```
