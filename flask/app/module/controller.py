@@ -2,12 +2,6 @@ from flask import request, jsonify
 from app import app
 from .const import HttpStatus
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-  if request.method == 'POST':
-      print("<Request: {}>".format(request.json))
-  return "<h1>Hello World From Flask</h1>"
-
 @app.route('/api/v1/test', methods=['GET', 'POST'])
 def test():
   if request.method == 'GET':
