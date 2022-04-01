@@ -15,4 +15,6 @@ def serve(path):
         return send_from_directory(app.static_folder, 'index.html')
 
 
-from app.module.controller import *
+from app.module.controllers.home import *
+from app.module.controllers.transcript import *
+from app.module.controllers.table import *
