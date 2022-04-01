@@ -10,10 +10,10 @@ from pytesseract import Output
 from matplotlib import pyplot as plt
 import numpy as np
 import re
+from app import app
 
 ALLOWED_EXTENSIONS = {'pdf'}
 
-app = Flask(__name__)
 custom_config = r'--oem 1 --psm 6'
 
 def allowed_file(filename):
@@ -21,7 +21,7 @@ def allowed_file(filename):
 
 @app.route('/api/v1/uploader', methods = ['POST'])
 def upload_file():
-  try:
+  # try:
     if request.method == 'POST':
       if 'file' not in request.files:
         return 'No file part'
@@ -80,6 +80,7 @@ def upload_file():
         x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
         # print(x)
         output += x
+        pdf_string = output
         """
         TODO: Send to scriping
         """
@@ -105,15 +106,11 @@ def upload_file():
 
         payload = {}
 
-        pdf_string = output
-
         minify_string = re.sub(r'\n{2,}', '\n', pdf_string)
-        # print(minify_string)
 
         name = re.search(regex['name'], minify_string)
 
-        birthdayAndStudentId = re.search(
-            regex['birthdayAndStudentId'], minify_string)
+        birthdayAndStudentId = re.search(regex['birthdayAndStudentId'], minify_string)
 
         admission = re.search(regex['admission'], minify_string)
 
@@ -129,45 +126,39 @@ def upload_file():
 
         subjects = []
         for semester in semesters:
-            # print(semester)
-            # print()
-            print(semester[0])
-            if semester[0] == "Ist":
-              s = "1st"
-            else:
-              s = semester[0]
 
-            semester_data = {
-                "semester": s,
-                "year": semester[1],
-                "GPS": semester[3],
-                "GPA": semester[4],
-                "courses": []
-            }
+          if semester[0] == 'Ist':
+            sem = '1st'
+          else:
+            sem = semester[0]
 
-            courses_insem = re.findall(regex['courseInfo'], semester[2])
-            # print(courses_insem)
-            # print()
+          semester_data = {
+              "semester": sem,
+              "year": semester[1],
+              "GPS": semester[3],
+              "GPA": semester[4],
+              "courses": []
+          }
 
-            for course in courses_insem:
-                # print(course)
-                # print()
-                course_data = {
-                    "courseId": course[0],
-                    "courseName": "",
-                    "credit": course[2],
-                    "grade": course[3]
-                }
-                # print(course)
-                remain = ""
-                if course[4] != "":
-                    remain = " " + course[4]
+          courses_insem = re.findall(regex['courseInfo'], semester[2])
 
-                course_data["courseName"] = course[1] + remain
+          for course in courses_insem:
+              course_data = {
+                  "courseId": course[0],
+                  "courseName": "",
+                  "credit": course[2],
+                  "grade": course[3]
+              }
+              # print(course)
+              remain = ""
+              if course[4] != "":
+                  remain = " " + course[4]
 
-                semester_data['courses'].append(course_data)
+              course_data["courseName"] = course[1] + remain
 
-            subjects.append(semester_data)
+              semester_data['courses'].append(course_data)
+
+          subjects.append(semester_data)
 
         payload['studentId'] = birthdayAndStudentId.group('studentId')
         payload['name'] = name.group('name')
@@ -183,5 +174,5 @@ def upload_file():
 
         return payload
 
-  except:
-     return 'Error'
+  # except:
+    #  return 'Error'

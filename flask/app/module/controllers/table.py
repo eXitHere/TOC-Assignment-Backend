@@ -4,7 +4,7 @@ from .const import HttpStatus
 from ..utils.table import tableCaching
 
 @app.route('/api/v1/tables', methods=['GET'])
-async def test():
+async def tables():
   if request.method == 'GET':
       data = await tableCaching()
       construct = {
