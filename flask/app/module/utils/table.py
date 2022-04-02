@@ -304,7 +304,7 @@ def toTableModel(tablesObj):
             course_type = 'เสรี'
 
           # courses.append({**course, 'class_year': class_year, 'midterm': midterm, 'final': final, 'course_type': course_type})
-          # print(course)
+          print(course)
           courses.append(Course(**{**course, 'class_year': class_year, 'midterm': midterm, 'final': final, 'course_type': course_type, "semester": semester, "year": year}))
   return courses
 

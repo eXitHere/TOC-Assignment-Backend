@@ -3,6 +3,7 @@ from app import app, auth
 from .const import HttpStatus
 from ..utils.table import tableCaching
 from json import dumps as jsonstring
+import re
 
 @app.route('/api/v1/tables', methods=['GET'])
 @auth.login_required
@@ -13,6 +14,7 @@ async def tables():
       p_year            = request.args.get('year', default=None, type=str)
       p_semester        = request.args.get('semester', default=None, type=str)
       p_id              = request.args.get('id', default=None, type=str)
+      p_teacher         = request.args.get('teacher', default=None, type=str)
       
       courses = await tableCaching()
       res_courses = []
@@ -33,6 +35,18 @@ async def tables():
 
         if p_id and course.id != p_id:
           is_pass = False
+
+        # print(p_teacher)
+        # 'teacher': ['ดร.งามเฉิด ด่านพัฒนามงคล']
+        if p_teacher:
+          found_teacher = False
+          for teacher in course.teacher:
+            # if p_teacher == teacher:
+            if re.match(r"{}".format(p_teacher), teacher):
+              found_teacher = True
+              break
+          if not found_teacher:
+            is_pass = False
 
         if is_pass:
           res_courses.append(course.toDict())
