@@ -10,7 +10,7 @@ from pytesseract import Output
 from matplotlib import pyplot as plt
 import numpy as np
 import re
-from app import app
+from app import app, auth
 
 ALLOWED_EXTENSIONS = {'pdf'}
 
@@ -19,6 +19,7 @@ custom_config = r'--oem 1 --psm 6'
 def allowed_file(filename):
   return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@auth.login_required
 @app.route('/api/v1/uploader', methods = ['POST'])
 def upload_file():
   # try:
