@@ -21,7 +21,8 @@ async def fetchNewHTML():
   # Create a URI for our test file
   # page_path = 'https://new.reg.kmitl.ac.th/reg/#/teach_table?mode=by_class&selected_year=2564&selected_semester=2&selected_faculty=01&selected_department=05&selected_curriculum=06&selected_class_year&search_all_faculty=false&search_all_department=false&search_all_curriculum=false&search_all_class_year=true'
   page_paths = [
-    'https://new.reg.kmitl.ac.th/reg/#/teach_table?mode=by_class&selected_year=2564&selected_semester=2&selected_faculty=01&selected_department=05&selected_curriculum=06&selected_class_year=3&search_all_faculty=false&search_all_department=false&search_all_curriculum=false&search_all_class_year=false',
+    # 'https://new.reg.kmitl.ac.th/reg/#/teach_table?mode=by_class&selected_year=2564&selected_semester=2&selected_faculty=01&selected_department=05&selected_curriculum=06&selected_class_year=3&search_all_faculty=false&search_all_department=false&search_all_curriculum=false&search_all_class_year=false',
+    'https://new.reg.kmitl.ac.th/reg/#/teach_table?mode=by_class&selected_year=2564&selected_semester=2&selected_faculty=01&selected_department=05&selected_curriculum=06&selected_class_year&search_all_faculty=false&search_all_department=false&search_all_curriculum=false&search_all_class_year=true', # 
     'https://new.reg.kmitl.ac.th/reg/#/teach_table?mode=by_subject_owner_id&selected_year=2564&selected_semester=2&selected_faculty=01&search_all_faculty=false&selected_subject_owner_id=6', # ภาษา
     'https://new.reg.kmitl.ac.th/reg/#/teach_table?mode=by_subject_owner_id&selected_year=2564&selected_semester=2&selected_faculty=01&search_all_faculty=false&selected_subject_owner_id=10', # มนุษย์,
     'https://new.reg.kmitl.ac.th/reg/#/teach_table?mode=by_subject_owner_id&selected_year=2564&selected_semester=2&selected_faculty=01&search_all_faculty=false&selected_subject_owner_id=9', # สังคม,
@@ -281,23 +282,25 @@ def toTableModel(tablesObj):
 
           # detection type with courseId
           """
-          ภาษา    9020xxxx
-          มนุษย์    9030xxxx
-          สังคม    9040xxxx
-          วิทย์     9010xxxx
-          ภาค     0100xxxx
+          ภาษา    902xxxxx
+          มนุษย์    903xxxxx
+          สังคม    904xxxxx
+          วิทย์     901xxxxx
+          ภาค     010xxxxx
           """
           course_type = ""
-          if re.match(r"0100[\d]{4}", course['courseId']):
+          if re.match(r"010[\d]{5}", course['courseId']):
             course_type = 'ภาค'
-          if re.match(r"9020[\d]{4}", course['courseId']):
+          elif re.match(r"902[\d]{5}", course['courseId']):
             course_type = 'ภาษา'
-          if re.match(r"9030[\d]{4}", course['courseId']):
+          elif re.match(r"903[\d]{5}", course['courseId']):
             course_type = 'มนุษย์'
-          if re.match(r"9040[\d]{4}", course['courseId']):
+          elif re.match(r"904[\d]{5}", course['courseId']):
             course_type = 'สังคม'
-          if re.match(r"9010[\d]{4}", course['courseId']):
+          elif re.match(r"901[\d]{5}", course['courseId']):
             course_type = 'วิทย์'
+          else:
+            course_type = 'เสรี'
 
           courses.append({**course, 'class_year': class_year, 'midterm': midterm, 'final': final, 'course_type': course_type})
   print(len(courses))
