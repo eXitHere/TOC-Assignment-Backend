@@ -10,7 +10,9 @@ from pytesseract import Output
 from matplotlib import pyplot as plt
 import numpy as np
 import re
-from app import app, auth
+from app import app
+from ..utils.table import findById
+from ..utils.course import findCourseType
 
 ALLOWED_EXTENSIONS = {'pdf'}
 
@@ -19,9 +21,9 @@ custom_config = r'--oem 1 --psm 6'
 def allowed_file(filename):
   return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@auth.login_required
+# @auth.login_required
 @app.route('/api/v1/uploader', methods = ['POST'])
-def upload_file():
+async def upload_file():
   # try:
     if request.method == 'POST':
       if 'file' not in request.files:
@@ -32,55 +34,59 @@ def upload_file():
         return "No file selected"
       
       if f and allowed_file(f.filename):
-        filename = secure_filename(f.filename)
-        pages = convert_from_bytes(f.read(), 500)
-        page = pages[0]
-        img = np.array(page)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-        invert = 255 - thresh
+        # filename = secure_filename(f.filename)
+        # pages = convert_from_bytes(f.read(), 500)
+        # page = pages[0]
+        # img = np.array(page)
+        # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+        # invert = 255 - thresh
 
-        img = invert
-        output = ""
-        # print(img.shape)
+        # img = invert
+        # output = ""
 
-        # top
-        y=700
-        x=0
-        h=550
-        w=4134
-        crop = img[y:y+h, x:x+w]
-        crop = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
-        x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
-        # print(x)
-        output += x
-        # cv2.imwrite('top.jpg', crop)
+        # # top
+        # y=700
+        # x=0
+        # h=550
+        # w=4134
+        # crop = img[y:y+h, x:x+w]
+        # crop = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
+        # x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
+        # output += x
 
-        # left
-        y=1250
-        x=0
-        h=4597
-        w=2067
+        # # left
+        # y=1250
+        # x=0
+        # h=4597
+        # w=2067
 
-        crop = img[y:y+h, x:x+w]
-        # cv2.imwrite('left.jpg', crop)
-        crop = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
-        x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
+        # crop = img[y:y+h, x:x+w]
+        # crop = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
+        # x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
 
-        # print(x)
-        output += x
+        # # print(x)
+        # output += x
 
-        # right
-        y=1250
-        x=2067
-        h=4597
-        w=2067
-        crop = img[y:y+h, x:x+w]
-        # cv2.imwrite('right.jpg', crop)
-        crop = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
-        x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
-        # print(x)
-        output += x
+        # # right
+        # y=1250
+        # x=2067
+        # h=4597
+        # w=2067
+        # crop = img[y:y+h, x:x+w]
+        # crop = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
+        # x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
+        # output += x
+
+        # print(output)
+        # with open( 'transcript/{}.txt'.format("tmp") , mode='w', encoding="utf-8") as f:
+        #   f.write(output)
+        #   f.close()
+      
+        with open( 'transcript/{}.txt'.format("tmp") , mode='r', encoding="utf-8") as f:
+          output = f.read()
+          f.close()
+
         pdf_string = output
         """
         TODO: Send to scriping
@@ -173,7 +179,28 @@ def upload_file():
 
         # print(payload)
 
+        for idx, subject in enumerate(payload['subjects']):
+          for idxx, course in enumerate(subject['courses']):
+            # find table
+            # print(idx)
+            # c = await findById(course['courseId'])
+            # if len(c):
+              # courses_dict = [x.toDict() for x in c]
+              # payload['subjects'][idx]['courses'][idxx] = courses_dict
+            course_type = findCourseType(course['courseId'])
+            payload['subjects'][idx]['courses'][idxx] = {**payload['subjects'][idx]['courses'][idxx], 'course_type': course_type}
+            # pass
+
         return payload
 
   # except:
     #  return 'Error'
+
+
+"""
+- กลุ่มวิชาวิทยาศาสตร์กับคณิตศาสตร์ 6 หน่วยกิต
+- กลุ่มวิชาภาษา 12 หน่วยกิต
+- กลุ่มวิชามนุษยศาสตร์ 6 หน่วยกิต
+- กลุ่มวิชาสังคมศาสตร์ 6 หน่วยกิต
+
+"""

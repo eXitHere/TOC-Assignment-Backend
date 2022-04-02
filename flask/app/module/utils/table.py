@@ -9,6 +9,7 @@ import re
 import hashlib
 from os.path import exists
 from ..model.course import Course
+from .course import findCourseType
 
 timestamp = 0
 cacheing_time = 5 # minutes
@@ -289,26 +290,16 @@ def toTableModel(tablesObj):
           วิทย์     901xxxxx
           ภาค     010xxxxx
           """
-          course_type = ""
-          if re.match(r"010[\d]{5}", course['courseId']):
-            course_type = 'ภาค'
-          elif re.match(r"902[\d]{5}", course['courseId']):
-            course_type = 'ภาษา'
-          elif re.match(r"903[\d]{5}", course['courseId']):
-            course_type = 'มนุษย์'
-          elif re.match(r"904[\d]{5}", course['courseId']):
-            course_type = 'สังคม'
-          elif re.match(r"901[\d]{5}", course['courseId']):
-            course_type = 'วิทย์'
-          else:
-            course_type = 'เสรี'
+
+          course_type = findCourseType(course['courseId'])
+         
 
           # courses.append({**course, 'class_year': class_year, 'midterm': midterm, 'final': final, 'course_type': course_type})
           print(course)
           courses.append(Course(**{**course, 'class_year': class_year, 'midterm': midterm, 'final': final, 'course_type': course_type, "semester": semester, "year": year}))
   return courses
 
-async def tableCaching():
+async def cacheCheck():
   global timestamp
   global data
   # print(time.time() - timestamp, minuteToMilSecond(cacheing_time))
@@ -316,8 +307,21 @@ async def tableCaching():
     print('fetch new')
     timestamp = time.time()
     data = await fetchNewHTML()
-    # print(data)
     data = toTableModel(data)
   else:
     print('using cache')
+
+async def findById(id):
+  await cacheCheck()
+  global data
+  results = []
+  for course in data:
+    if course.id == id:
+      results.append(course)
+  
+  return results
+
+async def tableCaching():
+  await cacheCheck()
+  global data
   return data

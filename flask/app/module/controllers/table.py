@@ -1,12 +1,12 @@
 from flask import request, jsonify
-from app import app, auth
+from app import app
 from .const import HttpStatus
 from ..utils.table import tableCaching
 from json import dumps as jsonstring
 import re
 
 @app.route('/api/v1/tables', methods=['GET'])
-@auth.login_required
+# @auth.login_required
 async def tables():
   if request.method == 'GET':
       p_type            = request.args.get('type', default=None, type=str)
