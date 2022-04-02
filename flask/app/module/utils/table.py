@@ -8,6 +8,7 @@ from app import app
 import re
 import hashlib
 from os.path import exists
+from ..model.course import Course
 
 timestamp = 0
 cacheing_time = 5 # minutes
@@ -30,20 +31,12 @@ async def fetchNewHTML():
   ]
 
   soups = []
-  browser = await launch(
-    handleSIGINT=False,
-    handleSIGTERM=False,
-    handleSIGHUP=False
-  )
-
-  # Open a new browser page
-  page = await browser.newPage()
-
-  for page_path in page_paths:
-    md5_name  = hashlib.md5(page_path.encode())
-    file_path = 'html_page/{}.html'.format(md5_name.hexdigest())
-    # Launch the browser
-    if app.config['USE_LOCAL_HTML'] == True and exists(file_path) == True:
+  
+  # Launch the browser
+  if app.config['USE_LOCAL_HTML'] == True:
+    for page_path in page_paths:
+      md5_name  = hashlib.md5(page_path.encode())
+      file_path = 'html_page/{}.html'.format(md5_name.hexdigest())
       print('load file', page_path)
       with open(file_path, mode='r', encoding="utf-8") as f:
           # soup = BeautifulSoup(f.read(), 'html.parser', from_encoding="iso-8859-8")
@@ -52,9 +45,18 @@ async def fetchNewHTML():
           # print(soup)
           f.close()
 
-    else:
+  else:
+    browser = await launch(
+      handleSIGINT=False,
+      handleSIGTERM=False,
+      handleSIGHUP=False
+    )
 
     # Open our test file in the opened page
+    for page_path in page_paths:
+      page = await browser.newPage()
+      md5_name  = hashlib.md5(page_path.encode())
+      file_path = 'html_page/{}.html'.format(md5_name.hexdigest())
       print('fetch', page_path)
       await page.goto(page_path, {'waitUntil': 'networkidle0'})
       page_content = await page.content()
@@ -69,10 +71,9 @@ async def fetchNewHTML():
         f.close()
       # force clear content
       await page.close()
-      page = await browser.newPage()
-        
+      
     # Close browser
-  await browser.close()
+    await browser.close()
 
   regex = {
         "top": r'<main.*?<.*?<.*?<.*?<.*?<.*?<h2[^>]*>(?P<tableheader>.*?)</h2>.*?<h2[^>]*>(?P<semester>.*?)</h2></div><div[^>]*><div[^>]*>(?P<alltable>.*?)</div></div></div><div[^>]*><button.*?/button></div></div></div></div></main>',
@@ -302,8 +303,9 @@ def toTableModel(tablesObj):
           else:
             course_type = 'เสรี'
 
-          courses.append({**course, 'class_year': class_year, 'midterm': midterm, 'final': final, 'course_type': course_type})
-  print(len(courses))
+          # courses.append({**course, 'class_year': class_year, 'midterm': midterm, 'final': final, 'course_type': course_type})
+          # print(course)
+          courses.append(Course(**{**course, 'class_year': class_year, 'midterm': midterm, 'final': final, 'course_type': course_type, "semester": semester, "year": year}))
   return courses
 
 async def tableCaching():
