@@ -23,3 +23,11 @@
 1. [Backend](https://github.com/eXitHere/TOC-Assignment-Backend)
 2. [Frontend](https://github.com/eXitHere/TOC-Assignment-Backend)
 3. [Scraping](https://github.com/eXitHere/TOC-Assignment-Backend)
+
+## Routes
+
+`http://localhost:8000/api/v1/tables?type=ทฤษฎี&class_year=1&semester=2&year=2564&id=01006010`
+
+## Run
+
+`export API_PWD=12345 && python3 run.py`
