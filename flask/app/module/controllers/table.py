@@ -42,7 +42,7 @@ async def tables():
           found_teacher = False
           for teacher in course.teacher:
             # if p_teacher == teacher:
-            if re.match(r"{}".format(p_teacher), teacher):
+            if re.search(r"{}".format(p_teacher), teacher):
               found_teacher = True
               break
           if not found_teacher:
@@ -55,6 +55,7 @@ async def tables():
           'data': res_courses,
           'success': True,
       }
+
       response = jsonify(construct)
       response.status_code = HttpStatus.OK
   
