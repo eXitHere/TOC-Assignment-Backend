@@ -34,58 +34,58 @@ async def upload_file():
         return "No file selected"
       
       if f and allowed_file(f.filename):
-        # filename = secure_filename(f.filename)
-        # pages = convert_from_bytes(f.read(), 500)
-        # page = pages[0]
-        # img = np.array(page)
-        # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-        # invert = 255 - thresh
+        filename = secure_filename(f.filename)
+        pages = convert_from_bytes(f.read(), 500)
+        page = pages[0]
+        img = np.array(page)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+        invert = 255 - thresh
 
-        # img = invert
-        # output = ""
+        img = invert
+        output = ""
 
-        # # top
-        # y=700
-        # x=0
-        # h=550
-        # w=4134
-        # crop = img[y:y+h, x:x+w]
-        # crop = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
-        # x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
-        # output += x
+        # top
+        y=700
+        x=0
+        h=550
+        w=4134
+        crop = img[y:y+h, x:x+w]
+        crop = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
+        x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
+        output += x
 
-        # # left
-        # y=1250
-        # x=0
-        # h=4597
-        # w=2067
+        # left
+        y=1250
+        x=0
+        h=4597
+        w=2067
 
-        # crop = img[y:y+h, x:x+w]
-        # crop = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
-        # x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
+        crop = img[y:y+h, x:x+w]
+        crop = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
+        x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
 
-        # # print(x)
-        # output += x
+        # print(x)
+        output += x
 
-        # # right
-        # y=1250
-        # x=2067
-        # h=4597
-        # w=2067
-        # crop = img[y:y+h, x:x+w]
-        # crop = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
-        # x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
-        # output += x
+        # right
+        y=1250
+        x=2067
+        h=4597
+        w=2067
+        crop = img[y:y+h, x:x+w]
+        crop = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
+        x = pytesseract.image_to_string(crop,config=custom_config, lang='eng')
+        output += x
 
         # print(output)
         # with open( 'transcript/{}.txt'.format("tmp") , mode='w', encoding="utf-8") as f:
         #   f.write(output)
         #   f.close()
       
-        with open( 'transcript/{}.txt'.format("tmp") , mode='r', encoding="utf-8") as f:
-          output = f.read()
-          f.close()
+        # with open( 'transcript/{}.txt'.format("tmp") , mode='r', encoding="utf-8") as f:
+        #   output = f.read()
+        #   f.close()
 
         pdf_string = output
         """
@@ -178,8 +178,45 @@ async def upload_file():
         payload['subjects'] = subjects
 
         # print(payload)
+        subjects = []
+
+        # credit recommends
+        credit_recommends = {
+          'ภาค': 1000,
+          'ภาษา': 12,
+          'มนุษย์': 6,
+          'สังคม': 6,
+          'เสรี': 6,
+          'วิทย์': 6
+        }
+
+        #
+        credit_counter = {
+          'ภาค': 0,
+          'ภาษา': 0,
+          'มนุษย์': 0,
+          'สังคม': 0,
+          'เสรี': 0,
+          'วิทย์': 0
+        }
+
+        course_recommends = [
+          ['01006030', '01076001', '01076002', '01006028'],
+          ['01006031', '01076003', '01076004', '01076012'],
+          ['01006032', '01076005', '01076006', '01076007'],
+          ['01076253', '01076008', '01076009', '01076010'],
+          ['01076011', '01076263'],
+          ['01076013', '01076014'],
+          ['01076311', '01076312', '01076015']
+        ]
 
         for idx, subject in enumerate(payload['subjects']):
+          courses = []
+
+          # remove current subjects
+          if idx == len(payload['subjects'])-1:
+            break
+
           for idxx, course in enumerate(subject['courses']):
             # find table
             # print(idx)
@@ -188,10 +225,38 @@ async def upload_file():
               # courses_dict = [x.toDict() for x in c]
               # payload['subjects'][idx]['courses'][idxx] = courses_dict
             course_type = findCourseType(course['courseId'])
-            payload['subjects'][idx]['courses'][idxx] = {**payload['subjects'][idx]['courses'][idxx], 'course_type': course_type}
+            curr_course = payload['subjects'][idx]['courses'][idxx]
+            # print(idx, curr_course)
+            courses.append({'course_type': course_type, 'id': curr_course['courseId'], 'name': curr_course['courseName']})
+
+            credit_counter[course_type] += int(curr_course['credit'])
+            
+            # if course_type == 'ภาค':
+            #   print(curr_course, credit_counter[course_type])
+              
+            payload['subjects'][idx]['courses'][idxx] = {'course_type': course_type, 'id': curr_course['courseId'], 'name': curr_course['courseName']}
             # pass
 
-        return payload
+          subjects.append(courses)
+          
+
+        # print(credit_counter)
+        _course_recommends = []
+
+        for _id in course_recommends[len(payload['subjects'])-1]:
+          _courses = await findById(_id)
+          # print(_courses)
+          for __course in _courses:
+            # print(__course)
+            _course_recommends.append(__course.toDict())
+        
+        return {'credit_recommends': credit_recommends, 
+                'credit_counter': credit_counter, 
+                'course_recommends': _course_recommends, 
+                'name': payload['name'], 
+                'student_id': payload['studentId'], 
+                'subjects': subjects
+                }
 
   # except:
     #  return 'Error'

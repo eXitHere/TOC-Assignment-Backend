@@ -219,3 +219,5 @@ $RECYCLE.BIN/
 
 *.pdf
 */test/*
+
+transcript/tmp.txt
