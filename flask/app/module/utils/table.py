@@ -38,7 +38,7 @@ async def fetchNewHTML():
     for page_path in page_paths:
       md5_name  = hashlib.md5(page_path.encode())
       file_path = 'html_page/{}.html'.format(md5_name.hexdigest())
-      print('load file', page_path)
+      # print('load file', page_path)
       with open(file_path, mode='r', encoding="utf-8") as f:
           # soup = BeautifulSoup(f.read(), 'html.parser', from_encoding="iso-8859-8")
           soup = BeautifulSoup(f, 'html.parser')
@@ -58,7 +58,7 @@ async def fetchNewHTML():
       page = await browser.newPage()
       md5_name  = hashlib.md5(page_path.encode())
       file_path = 'html_page/{}.html'.format(md5_name.hexdigest())
-      print('fetch', page_path)
+      # print('fetch', page_path)
       await page.goto(page_path, {'waitUntil': 'networkidle0'})
       page_content = await page.content()
       # Process extracted content with BeautifulSoup
@@ -252,11 +252,6 @@ def toTableModel(tablesObj):
           ## Modify midterm field
           midterm = course['midterm'].split()
           # print(midterm, course['midterm'])
-          """
-          TODO:
-          check midterm and final datetime is correct ?
-          """
-          # break
           ## "จัดสอบเอง"
           if(len(midterm) > 1):
             # ['จันทร์', '23', 'พ.ค.', '2022', '13:30', '-', '16:30']
@@ -293,10 +288,47 @@ def toTableModel(tablesObj):
 
           course_type = findCourseType(course['courseId'])
          
-
           # courses.append({**course, 'class_year': class_year, 'midterm': midterm, 'final': final, 'course_type': course_type})
-          print(course)
-          courses.append(Course(**{**course, 'class_year': class_year, 'midterm': midterm, 'final': final, 'course_type': course_type, "semester": semester, "year": year}))
+          
+          """
+          Check Duplicate
+          {
+            teacher: "...",
+            ... (ส่วนที่ทั้งสองเซคเหมือนกัน),
+            section: [
+              {
+                id: "1",
+                "schedule": [
+                  ...
+                ],
+                ... (ส่วนที่ทั้งสองเซคไม่เหมือนกัน)
+              },
+              {
+                id: "2",
+                "schedule": [
+                  ...
+                ],
+                ... (ส่วนที่ทั้งสองเซคไม่เหมือนกัน)
+              },
+            ]
+          }
+          """
+          dup = False
+          for c in courses:
+            if c.get_id() == course['courseId']:
+              dup = True
+              c.section.append({
+                "id": course['section'],
+                "schedule": course['schedule'],
+                "room": course['room'],
+                "building": course['building'],
+                "type": course['type']
+              })
+              break
+
+          if not dup:
+            courses.append(Course(**{**course, 'class_year': class_year, 'midterm': midterm, 'final': final, 'course_type': course_type, "semester": semester, "year": year}))
+  
   return courses
 
 async def cacheCheck():

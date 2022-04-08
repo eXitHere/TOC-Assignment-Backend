@@ -49,7 +49,7 @@ async def tables():
             is_pass = False
 
         if is_pass:
-          res_courses.append(course.toDict())
+          res_courses.append(course.to_dict())
 
       construct = {
           'data': res_courses,

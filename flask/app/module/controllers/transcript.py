@@ -222,7 +222,7 @@ async def upload_file():
             # print(idx)
             # c = await findById(course['courseId'])
             # if len(c):
-              # courses_dict = [x.toDict() for x in c]
+              # courses_dict = [x.to_dict() for x in c]
               # payload['subjects'][idx]['courses'][idxx] = courses_dict
             course_type = findCourseType(course['courseId'])
             curr_course = payload['subjects'][idx]['courses'][idxx]
@@ -248,7 +248,7 @@ async def upload_file():
           # print(_courses)
           for __course in _courses:
             # print(__course)
-            _course_recommends.append(__course.toDict())
+            _course_recommends.append(__course.to_dict())
         
         return {'credit_recommends': credit_recommends, 
                 'credit_counter': credit_counter, 
