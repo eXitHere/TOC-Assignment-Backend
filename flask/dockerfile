@@ -6,21 +6,18 @@ FROM python:3.8-slim
 # Install mysqlclient (must be compiled).
 RUN apt-get update -qq \
     && apt-get install --no-install-recommends --yes \
-        build-essential \
-        default-libmysqlclient-dev \
-        # Necessary for mysqlclient runtime. Do not remove.
+        gcc \
         libmariadb3 \
         ffmpeg \
         libsm6 \
         libxext6 \
         tesseract-ocr \
-        poppler-utils \
-
-    && rm -rf /var/lib/apt/lists/* \
-    && python3 -m pip install --no-cache-dir mysqlclient \
-    && apt-get autoremove --purge --yes \
-        build-essential \
-        default-libmysqlclient-dev
+        poppler-utils 
+    # && rm -rf /var/lib/apt/lists/* \
+    # && python3 -m pip install --no-cache-dir mysqlclient \
+    # && apt-get autoremove --purge --yes \
+    #     build-essential \
+    #     default-libmysqlclient-dev
 
 # By default, listen on port 8000
 EXPOSE 8000/tcp
@@ -31,6 +28,12 @@ WORKDIR /app
 # Copy the dependencies file to the working directory
 COPY requirements.txt .
 
+ENV VIRTUAL_ENV=/opt/venv
+
+RUN python3 -m venv $VIRTUAL_ENV
+
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
 # Install any dependencies
 RUN pip install -r requirements.txt
 
@@ -38,4 +41,4 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # Specify the command to run on container start
-CMD [ "python", "./run.py" ]
+CMD ["python", "./run.py" ]

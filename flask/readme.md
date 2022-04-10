@@ -49,5 +49,5 @@ route
 
 ```
 docker build -t toc-flask-container .
-docker run -p 8000:8000 toc-flask-container
-``
+docker run -d -p 8000:8000 toc-flask-container
+```
