@@ -15,9 +15,16 @@ async def tables():
       p_semester        = request.args.get('semester', default=None, type=str)
       p_id              = request.args.get('id', default=None, type=str)
       p_teacher         = request.args.get('teacher', default=None, type=str)
+      p_sorted_by       = request.args.get('sorted_by', default=None, type=str)
       
       courses = await tableCaching()
       res_courses = []
+
+      if p_sorted_by:
+        try:
+          courses = sorted(courses, key=lambda x: getattr(x, p_sorted_by), reverse=False)
+        except:
+          pass
 
       for course in courses:
         is_pass = True

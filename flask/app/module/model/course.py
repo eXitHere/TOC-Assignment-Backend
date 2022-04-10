@@ -46,24 +46,20 @@ class Course():
 
   def get_id(self):
     return self.id
-  
+
   def to_dict(self):
     return dict(
-                # type=self.type, 
                 name=self.name, 
                 id=self.id, 
-                credit=self.credit, 
-                section=self.section, 
-                # schedule=self.schedule,
-                # room=self.room, 
-                # building=self.building, 
-                teacher=self.teacher, 
-                midterm=self.midterm, 
-                final=self.final, 
-                restriction=self.restriction,
-                note=self.note, 
-                class_year=self.class_year, 
-                course_type=self.course_type, 
-                semester=self.semester,
-                year=self.year
+                # credit=self.credit, 
+                # section=self.section, 
+                # teacher=self.teacher, 
+                # midterm=self.midterm, 
+                # final=self.final, 
+                # restriction=self.restriction,
+                # note=self.note, 
+                # class_year=self.class_year, 
+                # course_type=self.course_type, 
+                # semester=self.semester,
+                # year=self.year
                 )
