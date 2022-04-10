@@ -1,0 +1,38 @@
+# Set base image (host OS)
+# FROM python:3.8-alpine
+
+FROM python:3.8-slim
+
+# Install mysqlclient (must be compiled).
+RUN apt-get update -qq \
+    && apt-get install --no-install-recommends --yes \
+        build-essential \
+        default-libmysqlclient-dev \
+        # Necessary for mysqlclient runtime. Do not remove.
+        libmariadb3 \
+        ffmpeg \
+        libsm6 \
+        libxext6 \
+    && rm -rf /var/lib/apt/lists/* \
+    && python3 -m pip install --no-cache-dir mysqlclient \
+    && apt-get autoremove --purge --yes \
+        build-essential \
+        default-libmysqlclient-dev
+
+# By default, listen on port 8000
+EXPOSE 8000/tcp
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the dependencies file to the working directory
+COPY requirements.txt .
+
+# Install any dependencies
+RUN pip install -r requirements.txt
+
+# Copy the content of the local src directory to the working directory
+COPY . .
+
+# Specify the command to run on container start
+CMD [ "python", "./run.py" ]
