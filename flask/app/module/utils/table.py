@@ -3,7 +3,7 @@
 import time
 from pyppeteer import launch
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 from app import app
 import re
 import hashlib
@@ -13,6 +13,8 @@ from .course import findCourseType
 
 timestamp = 0
 cacheing_time = 5 # minutes
+start_date = datetime(year=2022, month=1, day=1)
+week_count = 20
 data = {}
 
 def minuteToMilSecond(min):
@@ -185,6 +187,7 @@ async def fetchNewHTML():
 def toTableModel(tablesObj):
   courses = []
   daysThai = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์']
+  daysThai2 = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.']
   monthThai = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.']
 
   for tableObj in tablesObj:
@@ -244,7 +247,7 @@ def toTableModel(tablesObj):
 
             date_final_end = datetime(year=int(final[3]), month=int(m), day=int(final[1]))
             date_final_end = date_final_end.replace(minute=int(time_final_end[1]), hour=int(time_final_end[0]))
-            final = {'start': date_final_start, 'end': date_final_end}
+            final = {'start': int(date_final_start.timestamp()), 'end': int(date_final_end.timestamp())}
             # print(date_final_start, date_final_end)
           else:
             final = course['final']
@@ -270,12 +273,55 @@ def toTableModel(tablesObj):
 
             date_midterm_end = datetime(year=int(midterm[3]), month=int(m), day=int(midterm[1]))
             date_midterm_end = date_midterm_end.replace(minute=int(time_midterm_end[1]), hour=int(time_midterm_end[0]))
-            midterm = {'start': date_midterm_start, 'end': date_midterm_end}
+            midterm = {'start': int(date_midterm_start.timestamp()), 'end': int(date_midterm_end.timestamp())}
             # print(date_midterm_end )
             # print(date_midterm_start, date_midterm_end)
           else:
             midterm = course['midterm']
           # print(course['final'], "\n",course['midterm'],"\n", final, "\n",midterm, final == midterm,"\n\n")
+
+          ## Modify schedule field
+          new_schedule = []
+
+          if len(course['schedule']) >= 1:
+            print("D1")
+            for w in range(week_count):
+              # ['ศ. 09:00-12:00']
+              _d             = course['schedule'][0].split(" ")
+              _idx_day       = daysThai2.index(_d[0])
+              _t             = _d[1].split("-")
+              _t_start       = _t[0].split(":")
+              _t_end         = _t[1].split(":")
+              _tmp_day       = start_date + timedelta(days=(w*7) + _idx_day)
+              _tmp_day_start = _tmp_day.replace(minute=int(_t_start[1]), hour=int(_t_start[0]))
+              _tmp_day_end   = _tmp_day.replace(minute=int(_t_end[1]), hour=int(_t_end[0]))
+              # print(_tmp_day_start, _tmp_day_end)
+              new_schedule.append({
+                "start": int(_tmp_day_start.timestamp()),
+                "end": int(_tmp_day_end.timestamp())
+              })
+          
+          if len(course['schedule']) == 2:
+            print("D2")
+            for w in range(week_count):
+              # [
+              # "พฤ. 17:00-18:30",
+              # "+ พฤ. 18:45-20:15" <-- process only this line
+              # ]
+              _d             = course['schedule'][1].split(" ")[1:] # pop "+"
+              _idx_day       = daysThai2.index(_d[0])
+              _t             = _d[1].split("-")
+              _t_start       = _t[0].split(":")
+              _t_end         = _t[1].split(":")
+              _tmp_day       = start_date + timedelta(days=(w*7) + _idx_day)
+              _tmp_day_start = _tmp_day.replace(minute=int(_t_start[1]), hour=int(_t_start[0]))
+              _tmp_day_end   = _tmp_day.replace(minute=int(_t_end[1]), hour=int(_t_end[0]))
+              # print(_tmp_day_start, _tmp_day_end)
+              new_schedule.append({
+                "start": int(_tmp_day_start.timestamp()),
+                "end": int(_tmp_day_end.timestamp())
+              })
+            print(new_schedule)
 
           # detection type with courseId
           """
@@ -313,6 +359,9 @@ def toTableModel(tablesObj):
             ]
           }
           """
+
+          course['schedule'] = new_schedule
+
           dup = False
           for c in courses:
             if c.get_id() == course['courseId']:
@@ -320,6 +369,7 @@ def toTableModel(tablesObj):
               c.section.append({
                 "id": course['section'],
                 "schedule": course['schedule'],
+                # "schedule": new_schedule,
                 "room": course['room'],
                 "building": course['building'],
                 "type": course['type']
