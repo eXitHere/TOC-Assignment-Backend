@@ -8,15 +8,15 @@ import re
 @app.route('/api/v1/tables', methods=['GET'])
 # @auth.login_required
 async def tables():
-  if request.method == 'GET':
-      p_type            = request.args.get('type', default=None, type=str)
+  try:
+    if request.method == 'GET':
       p_class_year      = request.args.get('class_year', default=None, type=str)
-      p_year            = request.args.get('year', default=None, type=str)
-      p_semester        = request.args.get('semester', default=None, type=str)
-      p_id              = request.args.get('id', default=None, type=str)
-      p_teacher         = request.args.get('teacher', default=None, type=str)
-      p_sorted_by       = request.args.get('sorted_by', default=None, type=str)
-      
+      p_year            = request.args.get('year',       default=None, type=str)
+      p_semester        = request.args.get('semester',   default=None, type=str)
+      p_id              = request.args.get('id',         default=None, type=str)
+      p_teacher         = request.args.get('teacher',    default=None, type=str)
+      p_sorted_by       = request.args.get('sorted_by',  default=None, type=str)
+      p_course_type     = request.args.get('course_type',  default=None, type=str)
       courses = await tableCaching()
       res_courses = []
 
@@ -28,10 +28,11 @@ async def tables():
 
       for course in courses:
         is_pass = True
-        if p_type and course.type != p_type:
-          is_pass = False
 
         if p_class_year and course.class_year != p_class_year:
+          is_pass = False
+
+        if p_course_type and course.course_type != p_course_type:
           is_pass = False
 
         if p_year and course.year != p_year:
@@ -43,12 +44,9 @@ async def tables():
         if p_id and course.id != p_id:
           is_pass = False
 
-        # print(p_teacher)
-        # 'teacher': ['ดร.งามเฉิด ด่านพัฒนามงคล']
         if p_teacher:
           found_teacher = False
           for teacher in course.teacher:
-            # if p_teacher == teacher:
             if re.search(r"{}".format(p_teacher), teacher):
               found_teacher = True
               break
@@ -65,5 +63,13 @@ async def tables():
 
       response = jsonify(construct)
       response.status_code = HttpStatus.OK
+      
+  except Exception as e: 
+    print(e)
+
+    response = jsonify({
+      'error': 'unknown error!'
+    })
+    response.status_code = HttpStatus.BAD_REQUEST
   
   return response

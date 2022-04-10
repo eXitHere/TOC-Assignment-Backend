@@ -1,19 +1,19 @@
 import re
 
-def findCourseType(id):
-  course_type = ""
+def find_course_type(id):
+  course_type   = ""
   
   if re.match(r"010[\d]{5}", id):
-    course_type = 'ภาค'
+    course_type = 'department'
   elif re.match(r"902[\d]{5}", id):
-    course_type = 'ภาษา'
+    course_type = 'language'
   elif re.match(r"903[\d]{5}", id):
-    course_type = 'มนุษย์'
+    course_type = 'human'
   elif re.match(r"904[\d]{5}", id):
-    course_type = 'สังคม'
+    course_type = 'social'
   elif re.match(r"901[\d]{5}", id):
-    course_type = 'วิทย์'
+    course_type = 'sciMath'
   else:
-    course_type = 'เสรี'
+    course_type = 'free'
 
   return course_type

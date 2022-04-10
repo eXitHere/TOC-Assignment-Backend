@@ -29,7 +29,22 @@ python run.js
 ```
 route
 - '/'
-- '/api/v1/test'
+- '/api/v1/tables'
+  # example
+  + /api/v1/tables?sorted_by=name&course_type=free
+  + /api/v1/tables?sorted_by=name&teacher=สย
+  # Params
+  + sorted_by=string
+  + class_year=stringส
+  + year=string
+  + semester=string
+  + id=string
+  + teacher=string <regex>
+- /api/v1/uploader
+  # type: form-data
+
+  # body:
+  + file: doc.pdf
 ```
 
 ```
