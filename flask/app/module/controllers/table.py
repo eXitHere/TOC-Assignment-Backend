@@ -10,13 +10,15 @@ import re
 async def tables():
   try:
     if request.method == 'GET':
-      p_class_year      = request.args.get('class_year', default=None, type=str)
-      p_year            = request.args.get('year',       default=None, type=str)
-      p_semester        = request.args.get('semester',   default=None, type=str)
-      p_id              = request.args.get('id',         default=None, type=str)
-      p_teacher         = request.args.get('teacher',    default=None, type=str)
-      p_sorted_by       = request.args.get('sorted_by',  default=None, type=str)
+      p_class_year      = request.args.get('class_year',  default=None, type=str)
+      p_year            = request.args.get('year',         default=None, type=str)
+      p_semester        = request.args.get('semester',     default=None, type=str)
+      p_id              = request.args.get('id',           default=None, type=str)
+      p_teacher         = request.args.get('teacher',      default=None, type=str)
+      p_sorted_by       = request.args.get('sorted_by',    default=None, type=str)
+      p_name            = request.args.get('name',         default=None, type=str)
       p_course_type     = request.args.get('course_type',  default=None, type=str)
+
       courses = await tableCaching()
       res_courses = []
 
@@ -43,6 +45,10 @@ async def tables():
 
         if p_id and course.id != p_id:
           is_pass = False
+
+        if p_name and course.name != p_name:
+          if not re.search(r"{}".format(p_name.upper()), course.name):
+            is_pass = False
 
         if p_teacher:
           found_teacher = False
