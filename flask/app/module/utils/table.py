@@ -10,10 +10,11 @@ import hashlib
 from os.path import exists
 from ..model.course import Course
 from .course import find_course_type
+import json
 
 timestamp     = 0
 cacheing_time = 300 # minutes
-start_date    = datetime(year=2022, month=1, day=1)
+start_date    = datetime(year=2022, month=1, day=10)
 week_count    = 20
 data          = {}
 daysThai      = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์']
@@ -229,13 +230,19 @@ def toTableModel(tablesObj):
 
       for field_subject in subject['field_subjects']:
         for course in field_subject['courses']:
+          # if(course['courseId'] == "90201012"):
+          #   print(json.dumps(course, ensure_ascii=False))
           
           ## remove duplicate course
           found     = False
           for x in courses:
-            if x == course:
-              found = True
-              break
+            if x.id == course['courseId']:
+              for sec in x.section:
+                if sec['type'] == course['type'] and sec['id'] == course['section']:
+                  found = True
+                  break
+              if found:
+                break
 
           if found:
             continue
