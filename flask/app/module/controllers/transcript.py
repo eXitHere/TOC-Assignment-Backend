@@ -153,7 +153,8 @@ async def upload_file():
 
         # credit recommends
         credit_recommends = {
-          'department': 1000,
+          'department': 20,
+          'specific_department': 9,
           'language': 12,
           'human': 6,
           'social': 6,
@@ -163,6 +164,7 @@ async def upload_file():
 
         credit_counter = {
           'department': 0,
+          'specific_department': 0,
           'language': 0,
           'human': 0,
           'social': 0,
