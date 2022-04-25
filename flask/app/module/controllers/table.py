@@ -19,6 +19,7 @@ async def tables():
       p_name            = request.args.get('name',         default=None, type=str)
       p_course_type     = request.args.get('course_type',  default=None, type=str)
 
+
       courses = await tableCaching()
       res_courses = []
 
@@ -29,37 +30,39 @@ async def tables():
           pass
 
       for course in courses:
-        is_pass = True
+        is_match = False
+        if p_id and course.id == p_id:
+          is_match = True
 
-        if p_class_year and course.class_year != p_class_year:
-          is_pass = False
+        if not is_match:
+          is_match = True
 
-        if p_course_type and course.course_type != p_course_type:
-          is_pass = False
+          if p_class_year and course.class_year != p_class_year:
+            is_match = False
 
-        if p_year and course.year != p_year:
-          is_pass = False
+          if p_course_type and course.course_type != p_course_type:
+            is_match = False
 
-        if p_semester and course.semester != p_semester:
-          is_pass = False
+          if p_year and course.year != p_year:
+            is_match = False
 
-        if p_id and course.id != p_id:
-          is_pass = False
+          if p_semester and course.semester != p_semester:
+            is_match = False
 
-        if p_name and course.name != p_name:
-          if not re.search(r"{}".format(p_name.upper()), course.name):
-            is_pass = False
+          if p_name and course.name != p_name:
+            if not re.search(r"{}".format(p_name.upper()), course.name):
+              is_match = False
 
-        if p_teacher:
-          found_teacher = False
-          for teacher in course.teacher:
-            if re.search(r"{}".format(p_teacher), teacher):
-              found_teacher = True
-              break
-          if not found_teacher:
-            is_pass = False
+          if p_teacher:
+            found_teacher = False
+            for teacher in course.teacher:
+              if re.search(r"{}".format(p_teacher), teacher):
+                found_teacher = True
+                break
+            if found_teacher:
+              is_match = False
 
-        if is_pass:
+        if is_match == True:
           res_courses.append(course.to_dict())
 
       construct = {
