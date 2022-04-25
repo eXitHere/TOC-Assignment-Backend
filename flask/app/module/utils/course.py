@@ -8,7 +8,7 @@ def find_course_type(id):
   
   if re.match(r"01076(4[0-9]{2}|5[0-9][0-9])", id):
     course_type = 'specific_department'
-  elif re.match(r"0100[\d]{4}", id):
+  elif re.match(r"010[\d]{5}", id):
     course_type = 'department'
   elif re.match(r"902[\d]{5}", id):
     course_type = 'language'
