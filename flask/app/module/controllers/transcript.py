@@ -78,11 +78,10 @@ async def upload_file():
         crop    = img[y:y+h, x:x+w]
         crop    = cv2.resize(crop, (crop.shape[1]*2, crop.shape[0]*2))
         output += pytesseract.image_to_string(crop,config=custom_config, lang='eng')
-
         pdf_string = output
 
         regex      = {
-          "name": r'Name [Mrs]{2,3}.(?P<name>[-\w ]+)\n',
+          "name": r'Name [Mrs|Miss]{2,3}.(?P<name>[-\w ]+)\n',
           "birthdayAndStudentId": r'Date of Birth (?P<birthday>[\w, ]+) StudentID (?P<studentId>\d{8})\n',
           "admission": r'Date of Admission\s*(?P<admission_year>\d{4})',
           "degree": r'Degree (?P<degree>[\w ]+)\n',
@@ -139,14 +138,23 @@ async def upload_file():
               semester_data['courses'].append(course_data)
           subjects.append(semester_data)
 
+        # print("1")
         payload['studentId']      = birthdayAndStudentId.group('studentId')
+        # print("2")
         payload['name']           = name.group('name')
+        # print("3")
         payload['birthday']       = birthdayAndStudentId.group('birthday')
+        # print("4")
         payload['admission_year'] = admission.group('admission_year')
+        # print("5")
         payload['degree']         = degree.group('degree')
+        # print("6")
         payload['major']          = major.group('major')
+        # print("7")
         payload['total_credit']   = totalCredit.group('total_credit')
+        # print("8")
         payload['cumuGPA']        = cumuGPA.group('cumuGPA')
+        # print("9")
         payload['subjects']       = subjects
 
         subjects = []
