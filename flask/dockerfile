@@ -3,6 +3,10 @@
 
 FROM python:3.8-slim
 
+RUN ls /usr/share/zoneinfo && \
+    cp /usr/share/zoneinfo/Asia/Bangkok /etc/localtime && \
+    echo "Asia/Bangkok" >  /etc/timezone && 
+    
 # Install mysqlclient (must be compiled).
 RUN apt-get update -qq \
     && apt-get install --no-install-recommends --yes \
