@@ -12,9 +12,10 @@ from ..model.course import Course
 from .course import find_course_type
 import json
 
+
 timestamp     = 0
 cacheing_time = 300 # minutes
-start_date    = datetime(year=2022, month=1, day=10)
+start_date    = datetime(year=2022, month=1, day=10).replace(microsecond=0,second=0,minute=0, hour=0)
 week_count    = 20
 data          = {}
 daysThai      = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์']
